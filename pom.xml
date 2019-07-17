@@ -1,0 +1,24 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <artifactId>exp2-security-browser</artifactId>
+  <parent>
+  	<groupId>cn.zhang.jie</groupId>
+  	<artifactId>exp2-security</artifactId>
+  	<version>0.0.1-SNAPSHOT</version>
+  	<relativePath>../exp2-security</relativePath>
+  </parent>
+  
+  <dependencies>
+  	<dependency>
+  		<groupId>cn.zhang.jie</groupId>
+  		<artifactId>exp2-security-core</artifactId>
+  		<version>${exp.security.version}</version>
+  	</dependency>
+  	
+  	<!-- 浏览器环境下是基于 Session的，除此之外，这个依赖还能帮助解决集群环境下的session管理 -->
+  	<dependency>
+  		<groupId>org.springframework.session</groupId>
+  		<artifactId>spring-session</artifactId>
+  	</dependency>
+  </dependencies>
+</project>
