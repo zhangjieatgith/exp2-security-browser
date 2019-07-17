@@ -88,7 +88,7 @@ public class BrowserSecurityConfig extends WebSecurityConfigurerAdapter{
 			//开启请求的授权
 			.and().authorizeRequests()
 			//表示针对某些页面，赋予所有权限
-			.antMatchers("/authentication/require","/image/code"
+			.antMatchers("/authentication/require","/image/code","/code/*"
 				,sercurityProperties.getBrowser().getLoginPage()).permitAll()
 			//表示针对的是任意请求
 			.anyRequest()

@@ -14,5 +14,12 @@
 		<input type="checkbox" name="remember-me" value="true"/> 记住我<br> <!-- name是固定的 -->
 		<input type="submit" value="登录"/>
 	</form>
+	<hr>
+	<h3>短信登录</h3>
+	<form action="/authentication/mobile" method="post">
+		手机号: <input type="text" name="mobile" value="18551701800"/><br>
+		短信验证码: <input type="text" name="smsCode"/><a href="/code/sms?mobile=18551701800">发送验证码</a><br>
+		<input type="submit" value="登录"/>
+	</form>
 </body>
 </html>
