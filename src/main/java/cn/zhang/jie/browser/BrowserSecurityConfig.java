@@ -17,7 +17,9 @@ import org.springframework.security.web.authentication.rememberme.PersistentToke
 
 import cn.zhang.jie.browser.authentication.ImoocAuthenticationFailHandler;
 import cn.zhang.jie.browser.authentication.ImoocAuthenticationSuccessHandler;
+import cn.zhang.jie.core.authentication.mobile.SmsCodeAuthenticationSecurityConfig;
 import cn.zhang.jie.core.properties.SercurityProperties;
+import cn.zhang.jie.core.validate.code.SmsCodeFilter;
 import cn.zhang.jie.core.validate.code.ValidateCodeFilter;
 
 @Configuration
@@ -29,6 +31,9 @@ public class BrowserSecurityConfig extends WebSecurityConfigurerAdapter{
 	private ImoocAuthenticationSuccessHandler imoocAuthenticationSuccessHandler;
 	@Autowired
 	private ImoocAuthenticationFailHandler imoocAuthenticationFailHandler; 
+	@Autowired
+	//导入和短信验证相关的配置
+	private SmsCodeAuthenticationSecurityConfig smsCodeAuthenticationSecurityConfig; 
 	
 	@Autowired
 	//这是我们自己的实现类，这里用作“记住我”之后，根据用户名获取用户信息 
@@ -63,8 +68,17 @@ public class BrowserSecurityConfig extends WebSecurityConfigurerAdapter{
 		validateCodeFilter.setSercurityProperties(sercurityProperties);
 		validateCodeFilter.afterPropertiesSet();
 		
+		
+		//这是自定义的用来出来短信验证码校验的过滤器
+		SmsCodeFilter smsCodeFilter = new SmsCodeFilter();
+		smsCodeFilter.setAuthenticationFailureHandler(imoocAuthenticationFailHandler);
+		smsCodeFilter.setSercurityProperties(sercurityProperties);
+		smsCodeFilter.afterPropertiesSet();
+		
+		
 		//在过滤器链中配置自定义的过滤器，这里是用来添加图形校验码的校验逻辑
-		http.addFilterBefore(validateCodeFilter, UsernamePasswordAuthenticationFilter.class)
+		http.addFilterBefore(smsCodeFilter, UsernamePasswordAuthenticationFilter.class)
+			.addFilterBefore(validateCodeFilter, UsernamePasswordAuthenticationFilter.class)
 			//表示：如果是表单登录，那么就使用下面的配置
 			.formLogin()
 			//自定义登录页
@@ -95,7 +109,8 @@ public class BrowserSecurityConfig extends WebSecurityConfigurerAdapter{
 			//都需要身份认证
 			.authenticated()
 			//将跨站请求伪造禁用
-			.and().csrf().disable();		
-			
+			.and().csrf().disable()
+			//将 smsCodeAuthenticationSecurityConfig 中的配置也加入到当前的 http 中
+			.apply(smsCodeAuthenticationSecurityConfig);		
 	}
 }
