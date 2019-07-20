@@ -14,6 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
+import org.springframework.social.security.SpringSocialConfigurer;
 
 import cn.zhang.jie.browser.authentication.ImoocAuthenticationFailHandler;
 import cn.zhang.jie.browser.authentication.ImoocAuthenticationSuccessHandler;
@@ -38,6 +39,9 @@ public class BrowserSecurityConfig extends WebSecurityConfigurerAdapter{
 	@Autowired
 	//这是我们自己的实现类，这里用作“记住我”之后，根据用户名获取用户信息 
 	private UserDetailsService userDetailsService; 
+	
+	@Autowired
+	private SpringSocialConfigurer imoocSocialSecurityConfig;
 	
 	@Bean
 	//加上该配置后，就启用了密码加解密的功能
@@ -111,6 +115,8 @@ public class BrowserSecurityConfig extends WebSecurityConfigurerAdapter{
 			//将跨站请求伪造禁用
 			.and().csrf().disable()
 			//将 smsCodeAuthenticationSecurityConfig 中的配置也加入到当前的 http 中
-			.apply(smsCodeAuthenticationSecurityConfig);		
+			.apply(smsCodeAuthenticationSecurityConfig)
+			//作用是向当前的过滤器链上添加一个过滤器，引导用户做社交登录
+			.and().apply(imoocSocialSecurityConfig);		
 	}
 }
