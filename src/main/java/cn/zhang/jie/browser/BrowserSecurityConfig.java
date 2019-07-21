@@ -18,6 +18,7 @@ import org.springframework.social.security.SpringSocialConfigurer;
 
 import cn.zhang.jie.browser.authentication.ImoocAuthenticationFailHandler;
 import cn.zhang.jie.browser.authentication.ImoocAuthenticationSuccessHandler;
+import cn.zhang.jie.browser.logout.ImoocLogoutSuccessHandler;
 import cn.zhang.jie.browser.session.ImoocExpiredSessionStrategy;
 import cn.zhang.jie.core.authentication.mobile.SmsCodeAuthenticationSecurityConfig;
 import cn.zhang.jie.core.properties.SercurityProperties;
@@ -113,12 +114,23 @@ public class BrowserSecurityConfig extends WebSecurityConfigurerAdapter{
 			//新的session覆盖掉旧的session，如果需要记录一些信息，比如哪个session在什么时候将旧的session替换掉了，需要实现下面的接口
 			.expiredSessionStrategy(new ImoocExpiredSessionStrategy())
 			.and()
+			.and()
+			.logout()
+			//自定义退出的url
+			.logoutUrl("/signOut")
+			//它和 url是互斥的，配置了handler后会导致 url 失效
+			.logoutSuccessHandler(new ImoocLogoutSuccessHandler(sercurityProperties))
+			//退出成功时，删除那些cookie
+			.deleteCookies("JSESSIONID")
+			//自定义登录成功后重定向的url
+			.logoutSuccessUrl("/imooc-logout.html")
+			.and()
 		//表示使用 httpBasic 做验证
 		//http.httpBasic()
 			//开启请求的授权
-			.and().authorizeRequests()
+			.authorizeRequests()
 			//表示针对某些页面，赋予所有权限
-			.antMatchers("/authentication/require","/image/code","/code/*","/user/register","/session/invalid"
+			.antMatchers("/authentication/require","/image/code","/code/*","/user/register","/session/invalid","/demo-logout.html"
 				,sercurityProperties.getBrowser().getLoginPage(), sercurityProperties.getBrowser().getSignUpUrl()).permitAll()
 			//表示针对的是任意请求
 			.anyRequest()
