@@ -18,6 +18,7 @@ import org.springframework.social.security.SpringSocialConfigurer;
 
 import cn.zhang.jie.browser.authentication.ImoocAuthenticationFailHandler;
 import cn.zhang.jie.browser.authentication.ImoocAuthenticationSuccessHandler;
+import cn.zhang.jie.browser.session.ImoocExpiredSessionStrategy;
 import cn.zhang.jie.core.authentication.mobile.SmsCodeAuthenticationSecurityConfig;
 import cn.zhang.jie.core.properties.SercurityProperties;
 import cn.zhang.jie.core.validate.code.SmsCodeFilter;
@@ -101,12 +102,23 @@ public class BrowserSecurityConfig extends WebSecurityConfigurerAdapter{
 			.tokenValiditySeconds(sercurityProperties.getBrowser().getRememberMeSeconds())
 			//“记住我”在拿到用户名之后，用哪个实现去获取用户详细信息
 			.userDetailsService(userDetailsService)
+			//session管理
+			.and().sessionManagement()
+			//当session失效的时候的跳转地址,通常应该跳转到登录页
+			.invalidSessionUrl("/session/invalid")
+			//配置最大的session数量，用于保证session并发控制，1表示同一个用户，在后面产生的session会将前面产生的session覆盖掉
+			.maximumSessions(1)
+			//表示如果在Chrome中已经登录，此时又在Firefox中登录时，将被拒绝。即当session的数量达到最大时，将阻止后续的登录行为
+			.maxSessionsPreventsLogin(true)
+			//新的session覆盖掉旧的session，如果需要记录一些信息，比如哪个session在什么时候将旧的session替换掉了，需要实现下面的接口
+			.expiredSessionStrategy(new ImoocExpiredSessionStrategy())
+			.and()
 		//表示使用 httpBasic 做验证
 		//http.httpBasic()
 			//开启请求的授权
 			.and().authorizeRequests()
 			//表示针对某些页面，赋予所有权限
-			.antMatchers("/authentication/require","/image/code","/code/*","/user/register"
+			.antMatchers("/authentication/require","/image/code","/code/*","/user/register","/session/invalid"
 				,sercurityProperties.getBrowser().getLoginPage(), sercurityProperties.getBrowser().getSignUpUrl()).permitAll()
 			//表示针对的是任意请求
 			.anyRequest()
