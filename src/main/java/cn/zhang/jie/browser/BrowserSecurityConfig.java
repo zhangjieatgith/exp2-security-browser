@@ -5,6 +5,7 @@ import javax.sql.DataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -132,6 +133,10 @@ public class BrowserSecurityConfig extends WebSecurityConfigurerAdapter{
 			//表示针对某些页面，赋予所有权限
 			.antMatchers("/authentication/require","/image/code","/code/*","/user/register","/session/invalid","/demo-logout.html"
 				,sercurityProperties.getBrowser().getLoginPage(), sercurityProperties.getBrowser().getSignUpUrl()).permitAll()
+			//只有角色是ADMIN的用户，才能访问 /user
+			.antMatchers("/user").hasRole("ADMIN")
+			//.antMatchers(HttpMethod.GET, "/user").hasRole("ADMIN")	精确匹配，指定了请求方式
+			//.antMatchers("/user/*").hasRole("ADMIN")	如果路径中使用了变量，可以使用*来表示多级路径
 			//表示针对的是任意请求
 			.anyRequest()
 			//都需要身份认证
